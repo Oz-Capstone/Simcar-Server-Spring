@@ -5,6 +5,7 @@ import com.hsu.simcar.domain.Member;
 import com.hsu.simcar.dto.CarRegistrationRequest;
 import com.hsu.simcar.dto.CarResponse;
 import com.hsu.simcar.dto.CarDetailResponse;
+import com.hsu.simcar.dto.CarDiagnosisResponse;
 import com.hsu.simcar.repository.CarRepository;
 import com.hsu.simcar.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -95,5 +96,19 @@ public class CarService {
         }
 
         carRepository.delete(car);
+    }
+
+    @Transactional(readOnly = true)
+    public CarDiagnosisResponse diagnoseCar(Long carId) {
+        Car car = carRepository.findById(carId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 차량입니다"));
+                
+        // TODO: AI 서비스 연동 후 실제 진단 로직 구현
+        // 현재는 임시 응답을 반환
+        return CarDiagnosisResponse.builder()
+                .carId(car.getId())
+                .reliabilityScore(85) // 임시 점수
+                .evaluationComment("AI 진단 서비스 준비 중입니다.")
+                .build();
     }
 }

@@ -1,6 +1,7 @@
 package com.hsu.simcar.controller;
 
 import com.hsu.simcar.dto.CarDetailResponse;
+import com.hsu.simcar.dto.CarDiagnosisResponse;
 import com.hsu.simcar.dto.CarRegistrationRequest;
 import com.hsu.simcar.dto.CarResponse;
 import com.hsu.simcar.service.CarService;
@@ -95,5 +96,19 @@ public class CarController {
         }
         carService.deleteCar(carId, sellerId);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "차량 신뢰도 진단", description = "AI 모델을 사용하여 차량의 신뢰도를 진단합니다.")
+    @GetMapping("/cars/{carId}/diagnosis")
+    public ResponseEntity<CarDiagnosisResponse> diagnoseCar(
+        @Parameter(
+            name = "carId",
+            description = "차량 ID", 
+            required = true,
+            in = ParameterIn.PATH,
+            example = "1"
+        )
+        @PathVariable("carId") Long carId) {
+        return ResponseEntity.ok(carService.diagnoseCar(carId));
     }
 }
