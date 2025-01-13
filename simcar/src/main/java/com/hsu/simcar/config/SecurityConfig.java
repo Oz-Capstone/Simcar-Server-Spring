@@ -29,8 +29,10 @@ public class SecurityConfig {
                             "/v3/api-docs/**", 
                             "/swagger-resources/**",
                             "/swagger-ui.html",
-                            "/h2-console/**", // H2 콘솔 접근 허용
-                            "/api/**").permitAll()
+                            "/h2-console/**",
+                            "/api/login",
+                            "/api/logout",
+                            "/api/join").permitAll()
                 .anyRequest().authenticated()
             )
             .build();
