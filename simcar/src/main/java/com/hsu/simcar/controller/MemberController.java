@@ -15,19 +15,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/members")  // /api에서 /api/members로 변경
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
 
-    @PostMapping("/join")
+    @PostMapping
     public ResponseEntity<Void> join(@Valid @RequestBody MemberJoinRequest request) {
         memberService.join(request);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/login")
+    @PostMapping("/login") 
     public ResponseEntity<Void> login(@Valid @RequestBody MemberLoginRequest request, 
                                     HttpSession session) {
         Member member = memberService.login(request);
