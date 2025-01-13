@@ -1,15 +1,19 @@
 package com.hsu.simcar.controller;
 
 import com.hsu.simcar.domain.Member;
+import com.hsu.simcar.dto.CarResponse;
 import com.hsu.simcar.dto.MemberJoinRequest;
 import com.hsu.simcar.dto.MemberLoginRequest;
 import com.hsu.simcar.dto.MemberProfileResponse;
 import com.hsu.simcar.dto.MemberUpdateRequest;
+import com.hsu.simcar.service.CarService;
 import com.hsu.simcar.service.MemberService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
+    private final CarService carService;
 
     @PostMapping("/join")
     public ResponseEntity<Void> join(@Valid @RequestBody MemberJoinRequest request) {
@@ -78,5 +83,14 @@ public class MemberController {
         memberService.deleteMember(memberId);
         session.invalidate();
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/sales")
+    public ResponseEntity<List<CarResponse>> getMySales(HttpSession session) {
+        Long sellerId = (Long) session.getAttribute("memberId");
+        if (sellerId == null) {
+            return ResponseEntity.status(401).build();
+        }
+        return ResponseEntity.ok(carService.getMySales(sellerId));
     }
 }
