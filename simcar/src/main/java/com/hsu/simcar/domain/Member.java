@@ -26,4 +26,10 @@ public class Member {
     private String name;
     
     private String phone;
+
+    public void updateProfile(String password, String name, String phone) {
+        this.password = password;
+        this.name = name;
+        this.phone = phone;
+    }
 }

@@ -30,9 +30,7 @@ public class SecurityConfig {
                             "/swagger-resources/**",
                             "/swagger-ui.html",
                             "/h2-console/**",
-                            "/api/login",
-                            "/api/logout",
-                            "/api/join").permitAll()
+                            "/api/**").permitAll()
                 .anyRequest().authenticated()
             )
             .build();
