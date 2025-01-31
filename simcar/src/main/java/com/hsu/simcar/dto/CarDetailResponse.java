@@ -16,8 +16,8 @@ public class CarDetailResponse {
     private String fuelType;
     private String imageUrl;
     private String carNumber;
-    private String insuranceHistory;
-    private String inspectionHistory;
+    private Integer insuranceHistory;
+    private Integer inspectionHistory;
     private String color;
     private String transmission;
     private String region;

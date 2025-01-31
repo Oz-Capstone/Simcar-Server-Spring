@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CarService {
     private final CarRepository carRepository;
     private final MemberRepository memberRepository;
+    private final AICarDiagnosisService aiCarDiagnosisService;
 
     @Transactional
     public void registerCar(Long sellerId, CarRegistrationRequest request) {
@@ -103,12 +104,6 @@ public class CarService {
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 차량입니다"));
                 
-        // TODO: AI 서비스 연동 후 실제 진단 로직 구현
-        // 현재는 임시 응답을 반환
-        return CarDiagnosisResponse.builder()
-                .carId(car.getId())
-                .reliabilityScore(85) // 임시 점수
-                .evaluationComment("AI 진단 서비스 준비 중입니다.")
-                .build();
+        return aiCarDiagnosisService.diagnose(car);
     }
 }

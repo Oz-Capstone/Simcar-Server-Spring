@@ -10,5 +10,4 @@ public class CarDiagnosisResponse {
     private Long carId;
     private Integer reliabilityScore; // 0-100 
     private String evaluationComment;
-    // AI 모델이 개발되면 더 필요한 필드들을 추가할 수 있음
 }

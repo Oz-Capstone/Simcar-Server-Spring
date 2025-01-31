@@ -29,8 +29,8 @@ public class Car {
     private String fuelType; // 연료
     private String imageUrl; // 사진
     private String carNumber; // 차량번호
-    private String insuranceHistory; // 보험이력
-    private String inspectionHistory; // 성능점검이력
+    private Integer insuranceHistory; // 보험이력
+    private Integer inspectionHistory; // 성능점검 이력
     private String color; // 색상
     private String transmission; // 변속기
     private String region; // 판매지역

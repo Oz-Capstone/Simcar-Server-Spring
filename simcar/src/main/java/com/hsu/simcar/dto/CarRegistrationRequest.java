@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Min;
 @Data
 public class CarRegistrationRequest {
     @NotBlank(message = "차종은 필수입니다")
-    @Schema(description = "차종", example = "세단")
+    @Schema(description = "차종", example = "sedan")
     private String type;
     
     @NotNull(message = "금액은 필수입니다")
@@ -18,11 +18,11 @@ public class CarRegistrationRequest {
     private Long price;
     
     @NotBlank(message = "브랜드는 필수입니다")
-    @Schema(description = "브랜드", example = "현대")
+    @Schema(description = "브랜드", example = "hyundai")
     private String brand;
     
     @NotBlank(message = "모델명은 필수입니다")
-    @Schema(description = "모델명", example = "소나타")
+    @Schema(description = "모델명", example = "elantra")
     private String model;
     
     @NotNull(message = "연식은 필수입니다")
@@ -45,8 +45,15 @@ public class CarRegistrationRequest {
     @Schema(description = "차량번호", example = "12가 3456")
     private String carNumber;
     
-    private String insuranceHistory;
-    private String inspectionHistory;
+    @NotNull(message = "보험이력은 필수입니다")
+    @Min(value = 0, message = "보험이력은 0회 이상이어야 합니다")
+    @Schema(description = "보험이력 횟수", example = "2")
+    private Integer insuranceHistory;
+    
+    @NotNull(message = "성능점검이력은 필수입니다")
+    @Min(value = 0, message = "성능점검이력은 0회 이상이어야 합니다")
+    @Schema(description = "성능점검이력 횟수", example = "3")
+    private Integer inspectionHistory;
     
     @NotBlank(message = "색상은 필수입니다")
     @Schema(description = "색상", example = "검정")
@@ -57,7 +64,7 @@ public class CarRegistrationRequest {
     private String transmission;
     
     @NotBlank(message = "판매지역은 필수입니다")
-    @Schema(description = "판매지역", example = "서울")
+    @Schema(description = "판매지역", example = "Seoul")
     private String region;
     
     @NotBlank(message = "연락처는 필수입니다")
