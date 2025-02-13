@@ -9,28 +9,28 @@ import jakarta.validation.constraints.Min;
 @Data
 public class CarRegistrationRequest {
     @NotBlank(message = "차종은 필수입니다")
-    @Schema(description = "차종", example = "sedan")
+    @Schema(description = "차종", example = "SUV")
     private String type;
     
     @NotNull(message = "금액은 필수입니다")
     @Min(value = 0, message = "금액은 0보다 커야 합니다")
-    @Schema(description = "금액", example = "20000000")
+    @Schema(description = "금액", example = "50900000")
     private Long price;
     
     @NotBlank(message = "브랜드는 필수입니다")
-    @Schema(description = "브랜드", example = "hyundai")
+    @Schema(description = "브랜드", example = "genesis")
     private String brand;
     
     @NotBlank(message = "모델명은 필수입니다")
-    @Schema(description = "모델명", example = "elantra")
+    @Schema(description = "모델명", example = "gv70")
     private String model;
     
     @NotNull(message = "연식은 필수입니다")
-    @Schema(description = "연식", example = "2020")
+    @Schema(description = "연식", example = "2021")
     private Integer year;
     
     @NotNull(message = "주행거리는 필수입니다")
-    @Schema(description = "주행거리", example = "50000")
+    @Schema(description = "주행거리", example = "45873")
     private Integer mileage;
     
     @NotBlank(message = "연료 종류는 필수입니다")
