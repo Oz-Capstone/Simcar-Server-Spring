@@ -60,30 +60,34 @@ public class AICarDiagnosisService implements AIDiagnosisService {
     }
 
     private int getBrandIndex(String brand) {
-        return switch (brand.toLowerCase()) {
-            case "hyundai" -> 0;
-            case "toyota" -> 1;
-            case "honda" -> 2;
-            case "ford" -> 3;
-            case "bmw" -> 4;
-            case "mercedes" -> 5;
-            case "tesla" -> 6;
-            default -> throw new IllegalArgumentException("Unknown brand: " + brand);
-        };
-    }
+    return switch (brand.toLowerCase()) {
+        case "hyundai" -> 0;
+        case "kia" -> 1;
+        case "genesis" -> 2;
+        case "bmw" -> 3;
+        case "benz" -> 4;
+        case "audi" -> 5;
+        default -> throw new IllegalArgumentException("Unknown brand: " + brand);
+    };
+}
 
     private int getModelIndex(String model) {
-        return switch (model.toLowerCase()) {
-            case "elantra", "tucson" -> 0; // Hyundai
-            case "corolla", "camry", "rav4" -> 1; // Toyota
-            case "civic", "cr-v" -> 2; // Honda
-            case "f-150", "explorer" -> 3; // Ford
-            case "x3", "x5" -> 4; // BMW
-            case "e-class" -> 5; // Mercedes
-            case "model 3", "model y" -> 6; // Tesla
-            default -> throw new IllegalArgumentException("Unknown model: " + model);
-        };
-    }
+    return switch (model.toLowerCase()) {
+        // Hyundai models
+        case "grandeur", "sonata", "avante", "santafe" -> 0;
+        // Kia models
+        case "carnival", "k5", "sorento" -> 1;
+        // Genesis models
+        case "gv70", "g90" -> 2;
+        // BMW models
+        case "7series", "x6" -> 3;
+        // Benz models
+        case "amg gt", "s-class" -> 4;
+        // Audi models
+        case "a5", "a8" -> 5;
+        default -> throw new IllegalArgumentException("Unknown model: " + model);
+    };
+}
 
     private int getRegionIndex(String region) {
         return switch (region) {
