@@ -3,6 +3,8 @@ package com.hsu.simcar.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.hsu.simcar.dto.CarRegistrationRequest;
 
@@ -19,6 +21,10 @@ public class Car {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member seller;
+
+    @OneToMany(mappedBy = "car", cascade = CascadeType.REMOVE)
+    @Builder.Default
+    private List<Favorite> favorites = new ArrayList<>();
     
     private String type; // 차종
     private Long price; // 금액
