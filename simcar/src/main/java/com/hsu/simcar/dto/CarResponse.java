@@ -24,7 +24,7 @@ public class CarResponse {
         response.setBrand(car.getBrand());
         response.setModel(car.getModel());
         response.setYear(car.getProductionYear());
-        response.setImageUrl(car.getImageUrl());
+        response.setImageUrl(car.getRepresentativeImageUrl());
         response.setRegion(car.getRegion());
         response.setCreatedAt(car.getCreatedAt());
         return response;

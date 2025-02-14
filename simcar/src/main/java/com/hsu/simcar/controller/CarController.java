@@ -13,8 +13,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 @RestController
@@ -24,26 +29,35 @@ import java.util.List;
 public class CarController {
     private final CarService carService;
 
-    @Operation(summary = "차량 등록", description = "차량을 등록합니다.")
-    @PostMapping("/cars")
-    public ResponseEntity<Void> registerCar(
-            @Valid @RequestBody CarRegistrationRequest request,
-            HttpSession session) {
+    @Operation(summary = "차량 등록")
+    @PostMapping(value = "/cars", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> registerCar(
+        @RequestPart(value = "request") @Valid CarRegistrationRequest request,
+        @RequestPart(value = "images", required = true) List<MultipartFile> images,
+        HttpSession session) {
+        
         Long sellerId = (Long) session.getAttribute("memberId");
         if (sellerId == null) {
-            return ResponseEntity.status(401).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        carService.registerCar(sellerId, request);
+        
+        if (images.isEmpty()) {
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("최소 1개 이상의 차량 이미지를 등록해야 합니다.");
+        }
+        
+        carService.registerCar(sellerId, request, images);
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "전체 차량 조회", description = "전체 차량 목록을 조회합니다.")
+    @Operation(summary = "전체 차량 조회")
     @GetMapping("/cars")
     public ResponseEntity<List<CarResponse>> getAllCars() {
         return ResponseEntity.ok(carService.getAllCars());
     }
 
-    @Operation(summary = "차량 상세 조회", description = "차량 ID로 상세 정보를 조회합니다.")
+    @Operation(summary = "차량 상세 조회")
     @GetMapping("/cars/{carId}")
     public ResponseEntity<CarDetailResponse> getCarDetail(
         @Parameter(
@@ -57,7 +71,7 @@ public class CarController {
         return ResponseEntity.ok(carService.getCarDetail(carId));
     }
 
-    @Operation(summary = "차량 정보 수정", description = "차량 ID로 차량 정보를 수정합니다.")
+    @Operation(summary = "차량 정보 수정")
     @PutMapping("/cars/{carId}")
     public ResponseEntity<Void> updateCar(
             @Parameter(
@@ -78,7 +92,22 @@ public class CarController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "차량 삭제", description = "차량 ID로 차량을 삭제합니다.")
+    @Operation(summary = "차량 대표 이미지 변경")
+    @PutMapping("/cars/{carId}/thumbnail/{imageId}")
+    public ResponseEntity<Void> updateThumbnail(
+        @Parameter(description = "차량 ID", required = true) @PathVariable Long carId,
+        @Parameter(description = "이미지 ID", required = true) @PathVariable Long imageId,
+        HttpSession session) {
+        
+        Long sellerId = (Long) session.getAttribute("memberId");
+        if (sellerId == null) {
+            return ResponseEntity.status(401).build();
+        }
+        carService.updateThumbnail(carId, imageId, sellerId);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "차량 삭제")
     @DeleteMapping("/cars/{carId}")
     public ResponseEntity<Void> deleteCar(
             @Parameter(
@@ -98,7 +127,7 @@ public class CarController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "차량 신뢰도 진단", description = "AI 모델을 사용하여 차량의 신뢰도를 진단합니다.")
+    @Operation(summary = "차량 신뢰도 진단")
     @GetMapping("/cars/{carId}/diagnosis")
     public ResponseEntity<CarDiagnosisResponse> diagnoseCar(
         @Parameter(

@@ -26,7 +26,7 @@ public class AICarDiagnosisService implements AIDiagnosisService {
             .price(car.getPrice())
             .productionYear(car.getProductionYear())
             .mileage(car.getMileage())
-            .has_image(car.getImageUrl() != null ? 1 : 0)
+            .has_image(!car.getImages().isEmpty() ? 1 : 0)
             .insuranceHistory(car.getInsuranceHistory())
             .inspectionHistory(car.getInspectionHistory())
             .region(getRegionIndex(car.getRegion()))

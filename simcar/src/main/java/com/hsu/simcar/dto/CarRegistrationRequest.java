@@ -37,10 +37,6 @@ public class CarRegistrationRequest {
     @Schema(description = "연료 종류", example = "가솔린")
     private String fuelType;
     
-    @NotBlank(message = "차량 사진은 필수입니다")
-    @Schema(description = "차량 사진 URL", example = "http://example.com/car.jpg")
-    private String imageUrl;
-    
     @NotBlank(message = "차량번호는 필수입니다")
     @Schema(description = "차량번호", example = "12가 3456")
     private String carNumber;

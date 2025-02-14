@@ -22,9 +22,9 @@ public class Car {
     @JoinColumn(name = "member_id")
     private Member seller;
 
-    @OneToMany(mappedBy = "car", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Favorite> favorites = new ArrayList<>();
+    private List<CarImage> images = new ArrayList<>();
     
     private String type; // 차종
     private Long price; // 금액
@@ -33,7 +33,6 @@ public class Car {
     private Integer productionYear; // 연식
     private Integer mileage; // 주행거리
     private String fuelType; // 연료
-    private String imageUrl; // 사진
     private String carNumber; // 차량번호
     private Integer insuranceHistory; // 보험이력
     private Integer inspectionHistory; // 성능점검 이력
@@ -44,6 +43,20 @@ public class Car {
     
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public void addImage(CarImage image) {
+        this.images.add(image);
+        image.setCar(this);
+    }
+    
+    public String getRepresentativeImageUrl() {
+        return images.stream()
+            .filter(CarImage::isThumbnail)
+            .findFirst()
+            .map(CarImage::getFilePath)
+            .orElse(null);
+    }
+
     
     @PrePersist
     protected void onCreate() {
@@ -64,7 +77,6 @@ public class Car {
         this.productionYear = request.getYear();
         this.mileage = request.getMileage();
         this.fuelType = request.getFuelType();
-        this.imageUrl = request.getImageUrl();
         this.carNumber = request.getCarNumber();
         this.insuranceHistory = request.getInsuranceHistory();
         this.inspectionHistory = request.getInspectionHistory();

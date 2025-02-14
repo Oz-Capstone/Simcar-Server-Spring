@@ -25,11 +25,13 @@ public class SecurityConfig {
             .headers(headers -> headers
                 .addHeaderWriter((request, response) -> response.setHeader("X-Frame-Options", "SAMEORIGIN"))) // H2 콘솔용 프레임 허용
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/swagger-ui/**", 
+                .requestMatchers(
+                "/swagger-ui/**", 
                             "/v3/api-docs/**", 
                             "/swagger-resources/**",
                             "/swagger-ui.html",
                             "/h2-console/**",
+                            "/uploads/**",
                             "/api/**").permitAll()
                 .anyRequest().authenticated()
             )

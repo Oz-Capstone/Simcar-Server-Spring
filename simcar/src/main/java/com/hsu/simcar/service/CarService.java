@@ -1,6 +1,7 @@
 package com.hsu.simcar.service;
 
 import com.hsu.simcar.domain.Car;
+import com.hsu.simcar.domain.CarImage;
 import com.hsu.simcar.domain.Member;
 import com.hsu.simcar.dto.CarRegistrationRequest;
 import com.hsu.simcar.dto.CarResponse;
@@ -10,11 +11,13 @@ import com.hsu.simcar.repository.CarRepository;
 import com.hsu.simcar.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +25,12 @@ public class CarService {
     private final CarRepository carRepository;
     private final MemberRepository memberRepository;
     private final AICarDiagnosisService aiCarDiagnosisService;
+    private final FileService fileService;
 
     @Transactional
-    public void registerCar(Long sellerId, CarRegistrationRequest request) {
+    public void registerCar(Long sellerId, CarRegistrationRequest request, List<MultipartFile> images) {
         Member seller = memberRepository.findById(sellerId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
 
         Car car = Car.builder()
                 .seller(seller)
@@ -37,7 +41,6 @@ public class CarService {
                 .productionYear(request.getYear())
                 .mileage(request.getMileage())
                 .fuelType(request.getFuelType())
-                .imageUrl(request.getImageUrl())
                 .carNumber(request.getCarNumber())
                 .insuranceHistory(request.getInsuranceHistory())
                 .inspectionHistory(request.getInspectionHistory())
@@ -48,7 +51,30 @@ public class CarService {
                 .build();
 
         carRepository.save(car);
+
+        for (int i = 0; i < images.size(); i++) {
+            try {
+                MultipartFile image = images.get(i);
+                String storedFileName = fileService.saveFile(image);
+                
+                CarImage carImage = CarImage.builder()
+                    .car(car)
+                    .originalFileName(image.getOriginalFilename())
+                    .storedFileName(storedFileName)
+                    .filePath("/uploads/cars/" + storedFileName) // 저장된 파일의 접근 경로
+                    .fileSize(image.getSize())
+                    .contentType(image.getContentType())
+                    .isThumbnail(i == 0) // 첫 번째 이미지를 대표 이미지로 설정
+                    .build();
+                    
+                car.addImage(carImage);
+            } catch (IOException e) {
+                throw new RuntimeException("파일 저장 실패: " + e.getMessage());
+            }
+        }
     }
+    
+    
 
     @Transactional(readOnly = true)
     public List<CarResponse> getAllCars() {
@@ -85,6 +111,27 @@ public class CarService {
         // Car 엔티티에 업데이트 메서드 추가 필요
         car.update(request);
         carRepository.save(car);
+    }
+
+    @Transactional
+    public void updateThumbnail(Long carId, Long imageId, Long sellerId) {
+        Car car = carRepository.findById(carId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 차량입니다"));
+
+        if (!car.getSeller().getId().equals(sellerId)) {
+            throw new IllegalArgumentException("수정 권한이 없습니다");
+        }
+
+        // 모든 이미지의 썸네일 상태를 false로 변경
+        car.getImages().forEach(image -> image.setThumbnail(false));
+
+        // 선택한 이미지를 썸네일로 설정
+        CarImage newThumbnail = car.getImages().stream()
+            .filter(image -> image.getId().equals(imageId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이미지입니다"));
+        
+        newThumbnail.setThumbnail(true);
     }
 
     @Transactional

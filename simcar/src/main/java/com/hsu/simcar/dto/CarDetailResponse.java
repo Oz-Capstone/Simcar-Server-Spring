@@ -1,8 +1,11 @@
 package com.hsu.simcar.dto;
 
 import com.hsu.simcar.domain.Car;
+
 import lombok.Data;
+import java.util.List;
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @Data
 public class CarDetailResponse {
@@ -14,7 +17,7 @@ public class CarDetailResponse {
     private Integer year;
     private Integer mileage;
     private String fuelType;
-    private String imageUrl;
+    private List<CarImageResponse> images;
     private String carNumber;
     private Integer insuranceHistory;
     private Integer inspectionHistory;
@@ -26,6 +29,14 @@ public class CarDetailResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @Data
+    public static class CarImageResponse {
+        private Long id;
+        private String originalFileName;
+        private String filePath;
+        private boolean isThumbnail;
+    }
+
     public static CarDetailResponse from(Car car) {
         CarDetailResponse response = new CarDetailResponse();
         response.setId(car.getId());
@@ -36,7 +47,19 @@ public class CarDetailResponse {
         response.setYear(car.getProductionYear());
         response.setMileage(car.getMileage());
         response.setFuelType(car.getFuelType());
-        response.setImageUrl(car.getImageUrl());
+        
+        // 이미지 정보 변환
+        response.setImages(car.getImages().stream()
+            .map(image -> {
+                CarImageResponse imageResponse = new CarImageResponse();
+                imageResponse.setId(image.getId());
+                imageResponse.setOriginalFileName(image.getOriginalFileName());
+                imageResponse.setFilePath(image.getFilePath());
+                imageResponse.setThumbnail(image.isThumbnail());
+                return imageResponse;
+            })
+            .collect(Collectors.toList()));
+
         response.setCarNumber(car.getCarNumber());
         response.setInsuranceHistory(car.getInsuranceHistory());
         response.setInspectionHistory(car.getInspectionHistory());
