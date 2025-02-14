@@ -46,4 +46,17 @@ public class FileService {
         }
         return filename.substring(dot);
     }
+
+    public void deleteFile(String storedFileName) throws IOException {
+        String absolutePath = new File(uploadPath).getAbsolutePath();
+        File file = new File(absolutePath + File.separator + storedFileName);
+        
+        if (!file.exists()) {
+            throw new IOException("파일이 존재하지 않습니다: " + storedFileName);
+        }
+        
+        if (!file.delete()) {
+            throw new IOException("파일 삭제 실패: " + storedFileName);
+        }
+    }
 }

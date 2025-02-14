@@ -143,6 +143,14 @@ public class CarService {
             throw new IllegalArgumentException("삭제 권한이 없습니다");
         }
 
+        for (CarImage image : car.getImages()) {
+            try {
+                fileService.deleteFile(image.getStoredFileName());
+            } catch (IOException e) {
+                throw new RuntimeException("파일 삭제 실패: " + e.getMessage());
+            }
+        }
+
         carRepository.delete(car);
     }
 
