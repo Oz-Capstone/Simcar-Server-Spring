@@ -60,46 +60,55 @@ public class AICarDiagnosisService implements AIDiagnosisService {
     }
 
     private int getBrandIndex(String brand) {
-    return switch (brand.toLowerCase()) {
-        case "hyundai" -> 0;
-        case "kia" -> 1;
-        case "genesis" -> 2;
-        case "bmw" -> 3;
-        case "benz" -> 4;
-        case "audi" -> 5;
-        default -> throw new IllegalArgumentException("Unknown brand: " + brand);
-    };
-}
+        return switch (brand.toLowerCase()) {
+            case "hyundai", "현대" -> 0;
+            case "kia", "기아" -> 1;
+            case "genesis", "제네시스" -> 2;
+            case "bmw", "비엠더블유" -> 3;
+            case "benz", "벤츠" -> 4;
+            case "audi", "아우디" -> 5;
+            default -> throw new IllegalArgumentException("Unknown brand: " + brand);
+        };
+    }
 
     private int getModelIndex(String model) {
-    return switch (model.toLowerCase()) {
-        // Hyundai models
-        case "grandeur", "sonata", "avante", "santafe" -> 0;
-        // Kia models
-        case "carnival", "k5", "sorento" -> 1;
-        // Genesis models
-        case "gv70", "g90" -> 2;
-        // BMW models
-        case "7series", "x6" -> 3;
-        // Benz models
-        case "amg gt", "s-class" -> 4;
-        // Audi models
-        case "a5", "a8" -> 5;
-        default -> throw new IllegalArgumentException("Unknown model: " + model);
-    };
-}
+        return switch (model.toLowerCase()) {
+            // Hyundai models
+            case "grandeur", "그랜저", 
+                "sonata", "소나타",
+                "avante", "아반떼",
+                "santafe", "싼타페" -> 0;
+            // Kia models
+            case "carnival", "카니발",
+                "k5", "케이5",
+                "sorento", "쏘렌토" -> 1;
+            // Genesis models
+            case "gv70", "지브이70",
+                "g90", "지90" -> 2;
+            // BMW models
+            case "7series", "7시리즈",
+                "x6", "엑스6" -> 3;
+            // Benz models
+            case "amg gt", "에이엠지 지티",
+                "s-class", "s클래스" -> 4;
+            // Audi models
+            case "a5", "에이5",
+                "a8", "에이8" -> 5;
+            default -> throw new IllegalArgumentException("Unknown model: " + model);
+        };
+    }
 
     private int getRegionIndex(String region) {
         return switch (region) {
-            case "Seoul" -> 0;
-            case "Busan" -> 1;
-            case "Daegu" -> 2;
-            case "Incheon" -> 3;
-            case "Gwangju" -> 4;
-            case "Daejeon" -> 5;
-            case "Ulsan" -> 6;
-            case "Sejong" -> 7;
-            case "Gyeonggi" -> 8;
+            case "Seoul", "서울" -> 0;
+            case "Busan", "부산" -> 1;
+            case "Daegu", "대구" -> 2;
+            case "Incheon", "인천" -> 3;
+            case "Gwangju", "광주" -> 4;
+            case "Daejeon", "대전" -> 5;
+            case "Ulsan", "울산" -> 6;
+            case "Sejong", "세종" -> 7;
+            case "Gyeonggi", "경기" -> 8;
             default -> throw new IllegalArgumentException("Unknown region: " + region);
         };
     }
