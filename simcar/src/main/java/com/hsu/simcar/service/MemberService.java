@@ -1,12 +1,19 @@
 package com.hsu.simcar.service;
 
+import com.hsu.simcar.domain.Car;
 import com.hsu.simcar.domain.Member;
 import com.hsu.simcar.dto.MemberJoinRequest;
 import com.hsu.simcar.dto.MemberLoginRequest;
 import com.hsu.simcar.dto.MemberProfileResponse;
 import com.hsu.simcar.dto.MemberUpdateRequest;
+import com.hsu.simcar.repository.CarRepository;
+import com.hsu.simcar.repository.FavoriteRepository;
 import com.hsu.simcar.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+
+import java.io.IOException;
+import java.util.List;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +24,9 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FavoriteRepository favoriteRepository;
+    private final FileService fileService;
+    private final CarRepository carRepository;
 
     @Transactional
     public void join(MemberJoinRequest request) {
@@ -68,9 +78,28 @@ public class MemberService {
 
     @Transactional
     public void deleteMember(Long memberId) {
-        if (!memberRepository.existsById(memberId)) {
-            throw new IllegalArgumentException("존재하지 않는 회원입니다.");
-        }
-        memberRepository.deleteById(memberId);
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        // 1. 회원이 찜한 목록 삭제
+        favoriteRepository.deleteAllByMember(member);
+
+        // 2. 회원이 등록한 차량 찾기
+        List<Car> memberCars = carRepository.findAllBySeller(member);
+        
+        // 3. 차량 이미지 파일 삭제 후 차량 정보 삭제
+        memberCars.forEach(car -> {
+            car.getImages().forEach(image -> {
+                try {
+                    fileService.deleteFile(image.getStoredFileName());
+                } catch (IOException e) {
+                    throw new RuntimeException("파일 삭제 실패: " + e.getMessage());
+                }
+            });
+            carRepository.delete(car);
+        });
+
+        // 4. 회원 정보 삭제
+        memberRepository.delete(member);
     }
 }
