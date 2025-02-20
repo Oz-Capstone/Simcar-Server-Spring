@@ -1,5 +1,6 @@
 package com.hsu.simcar.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +24,9 @@ public class CarImage {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "car_id")
     private Car car;
+
+    @Column(name = "image_order")
+    private Integer order;
     
     private String originalFileName;    // 원본 파일명
     private String storedFileName;      // 저장된 파일명
@@ -33,5 +37,9 @@ public class CarImage {
     
     public void setCar(Car car) {
         this.car = car;
+    }
+
+    public void setOrder(Integer order) {
+        this.order = order;
     }
 }

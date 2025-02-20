@@ -158,7 +158,79 @@ public class CarService {
     public CarDiagnosisResponse diagnoseCar(Long carId) {
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 차량입니다"));
-                
+
         return aiCarDiagnosisService.diagnose(car);
+    }
+
+    @Transactional
+    public void addImages(Long carId, Long sellerId, List<MultipartFile> images) {
+        Car car = carRepository.findById(carId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 차량입니다"));
+            
+        if (!car.getSeller().getId().equals(sellerId)) {
+            throw new IllegalArgumentException("수정 권한이 없습니다");
+        }
+
+        for (MultipartFile image : images) {
+            try {
+                String storedFileName = fileService.saveFile(image);
+                
+                CarImage carImage = CarImage.builder()
+                    .car(car)
+                    .originalFileName(image.getOriginalFilename())
+                    .storedFileName(storedFileName)
+                    .filePath("/uploads/cars/" + storedFileName)
+                    .fileSize(image.getSize())
+                    .contentType(image.getContentType())
+                    .isThumbnail(false)
+                    .build();
+                    
+                car.addImage(carImage);
+            } catch (IOException e) {
+                throw new RuntimeException("파일 저장 실패: " + e.getMessage());
+            }
+        }
+    }
+
+    @Transactional
+    public void deleteImage(Long carId, Long imageId, Long sellerId) {
+        Car car = carRepository.findById(carId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 차량입니다"));
+            
+        if (!car.getSeller().getId().equals(sellerId)) {
+            throw new IllegalArgumentException("삭제 권한이 없습니다");
+        }
+
+        CarImage targetImage = car.getImages().stream()
+            .filter(img -> img.getId().equals(imageId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이미지입니다"));
+
+        boolean wasDeletedImageThumbnail = targetImage.isThumbnail();
+
+        try {
+            fileService.deleteFile(targetImage.getStoredFileName());
+            car.removeImage(targetImage);
+
+            // 삭제된 이미지가 대표 이미지였고 남은 이미지가 있다면
+            if (wasDeletedImageThumbnail && !car.getImages().isEmpty()) {
+                // 첫 번째 이미지를 대표 이미지로 설정
+                car.getImages().get(0).setThumbnail(true);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("파일 삭제 실패: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void updateImagesOrder(Long carId, List<Long> imageIds, Long sellerId) {
+        Car car = carRepository.findById(carId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 차량입니다"));
+            
+        if (!car.getSeller().getId().equals(sellerId)) {
+            throw new IllegalArgumentException("수정 권한이 없습니다");
+        }
+
+        car.updateImagesOrder(imageIds);
     }
 }

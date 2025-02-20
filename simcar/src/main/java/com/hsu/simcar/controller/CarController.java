@@ -95,8 +95,22 @@ public class CarController {
     @Operation(summary = "차량 대표 이미지 변경")
     @PutMapping("/cars/{carId}/thumbnail/{imageId}")
     public ResponseEntity<Void> updateThumbnail(
-        @Parameter(description = "차량 ID", required = true) @PathVariable Long carId,
-        @Parameter(description = "이미지 ID", required = true) @PathVariable Long imageId,
+        @Parameter(
+            name = "carId",
+            description = "차량 ID",
+            required = true,
+            in = ParameterIn.PATH,
+            example = "1"
+        )
+        @PathVariable("carId") Long carId,
+        @Parameter(
+            name = "imageId",
+            description = "대표 이미지로 설정할 이미지 ID",
+            required = true,
+            in = ParameterIn.PATH,
+            example = "1"
+        )
+        @PathVariable("imageId") Long imageId,
         HttpSession session) {
         
         Long sellerId = (Long) session.getAttribute("memberId");
@@ -137,7 +151,95 @@ public class CarController {
             in = ParameterIn.PATH,
             example = "1"
         )
-        @PathVariable("carId") Long carId) {
+            @PathVariable("carId") Long carId) {
         return ResponseEntity.ok(carService.diagnoseCar(carId));
+    }
+    
+    @Operation(summary = "차량 이미지 추가")
+    @PostMapping(value = "/cars/{carId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> addImages(
+        @Parameter(
+            name = "carId",
+            description = "차량 ID",
+            required = true,
+            in = ParameterIn.PATH,
+            example = "1"
+        )
+        @PathVariable("carId") Long carId,
+        @Parameter(
+            name = "images",
+            description = "추가할 차량 이미지 파일들",
+            required = true,
+            in = ParameterIn.DEFAULT
+        )
+        @RequestPart(value = "images") List<MultipartFile> images,
+        HttpSession session) {
+        
+        Long sellerId = (Long) session.getAttribute("memberId");
+        if (sellerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        carService.addImages(carId, sellerId, images);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "차량 이미지 삭제")
+    @DeleteMapping("/cars/{carId}/images/{imageId}")
+    public ResponseEntity<Void> deleteImage(
+        @Parameter(
+            name = "carId",
+            description = "차량 ID",
+            required = true,
+            in = ParameterIn.PATH,
+            example = "1"
+        )
+        @PathVariable("carId") Long carId,
+        @Parameter(
+            name = "imageId",
+            description = "삭제할 이미지 ID",
+            required = true,
+            in = ParameterIn.PATH,
+            example = "1"
+        )
+        @PathVariable("imageId") Long imageId,
+        HttpSession session) {
+        
+        Long sellerId = (Long) session.getAttribute("memberId");
+        if (sellerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        carService.deleteImage(carId, imageId, sellerId);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "차량 이미지 순서 변경")
+    @PutMapping("/cars/{carId}/images/order")
+    public ResponseEntity<Void> updateImagesOrder(
+        @Parameter(
+            name = "carId",
+            description = "차량 ID",
+            required = true,
+            in = ParameterIn.PATH,
+            example = "1"
+        )
+        @PathVariable("carId") Long carId,
+        @Parameter(
+            name = "imageIds",
+            description = "변경된 순서의 이미지 ID 리스트",
+            required = true,
+            example = "[1, 2, 3]"
+        )
+        @RequestBody List<Long> imageIds,
+        HttpSession session) {
+        
+        Long sellerId = (Long) session.getAttribute("memberId");
+        if (sellerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        carService.updateImagesOrder(carId, imageIds, sellerId);
+        return ResponseEntity.ok().build();
     }
 }

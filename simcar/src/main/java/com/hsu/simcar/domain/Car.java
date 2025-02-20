@@ -5,6 +5,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.hsu.simcar.dto.CarRegistrationRequest;
 
@@ -23,6 +24,7 @@ public class Car {
     private Member seller;
 
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderColumn(name = "image_order")
     @Builder.Default
     private List<CarImage> images = new ArrayList<>();
     
@@ -48,6 +50,31 @@ public class Car {
         this.images.add(image);
         image.setCar(this);
     }
+
+    public void removeImage(CarImage image) {
+        this.images.remove(image);
+        image.setCar(null);
+    }
+
+    public void updateImagesOrder(List<Long> imageIds) {
+        // 입력받은 순서대로 정렬된 이미지 리스트 생성
+        List<CarImage> sortedImages = imageIds.stream()
+            .map(imageId -> this.images.stream()
+                .filter(image -> image.getId().equals(imageId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이미지입니다")))
+            .collect(Collectors.toList());
+
+        // 순서 정보 업데이트
+        for (int i = 0; i < sortedImages.size(); i++) {
+            CarImage image = sortedImages.get(i);
+            image.setOrder(i);  // CarImage 엔티티에 order 필드 추가 필요
+        }
+
+        // 이미지 리스트 업데이트
+        this.images.clear();
+        this.images.addAll(sortedImages);
+    }
     
     public String getRepresentativeImageUrl() {
         return images.stream()
@@ -72,7 +99,7 @@ public class Car {
     public void update(CarRegistrationRequest request) {
         this.type = request.getType();
         this.price = request.getPrice();
-        this.brand = request.getBrand(); 
+        this.brand = request.getBrand();
         this.model = request.getModel();
         this.productionYear = request.getYear();
         this.mileage = request.getMileage();
