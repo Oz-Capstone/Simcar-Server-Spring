@@ -1,5 +1,6 @@
 package com.hsu.simcar.service;
 
+import lombok.extern.slf4j.Slf4j;
 import com.hsu.simcar.domain.Car;
 import com.hsu.simcar.domain.Member;
 import com.hsu.simcar.dto.MemberJoinRequest;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -91,9 +93,12 @@ public class MemberService {
         memberCars.forEach(car -> {
             car.getImages().forEach(image -> {
                 try {
-                    fileService.deleteFile(image.getStoredFileName());
+                    if (fileService.exists(image.getStoredFileName())) {
+                        fileService.deleteFile(image.getStoredFileName());
+                    }
                 } catch (IOException e) {
-                    throw new RuntimeException("파일 삭제 실패: " + e.getMessage());
+                    log.warn("파일 삭제 실패: {}", image.getStoredFileName());
+                    // 파일 삭제 실패해도 계속 진행
                 }
             });
             carRepository.delete(car);

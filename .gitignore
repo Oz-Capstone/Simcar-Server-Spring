@@ -87,3 +87,6 @@ application-*.yaml
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+
+/uploads/**
+!uploads/.gitkeep
