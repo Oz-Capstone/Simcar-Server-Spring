@@ -86,10 +86,11 @@ public class MemberService {
         // 1. 회원이 찜한 목록 삭제
         favoriteRepository.deleteAllByMember(member);
 
-        // 2. 회원이 등록한 차량 찾기
+        // 2. 다른 사용자가 이 회원의 차량을 찜한 목록 삭제
+        favoriteRepository.deleteAllByCarIn(carRepository.findAllBySeller(member));
+
+        // 3. 회원이 등록한 차량 찾기 및 처리
         List<Car> memberCars = carRepository.findAllBySeller(member);
-        
-        // 3. 차량 이미지 파일 삭제 후 차량 정보 삭제
         memberCars.forEach(car -> {
             car.getImages().forEach(image -> {
                 try {
