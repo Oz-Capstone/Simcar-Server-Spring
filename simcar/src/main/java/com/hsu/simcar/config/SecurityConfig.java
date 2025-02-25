@@ -20,19 +20,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
+            .requiresChannel(channel -> 
+                channel.anyRequest().requiresSecure()
+            )
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.disable())
             .headers(headers -> headers
-                .addHeaderWriter((request, response) -> response.setHeader("X-Frame-Options", "SAMEORIGIN"))) // H2 콘솔용 프레임 허용
+                .addHeaderWriter((request, response) -> response.setHeader("X-Frame-Options", "SAMEORIGIN")))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                "/swagger-ui/**", 
-                            "/v3/api-docs/**", 
-                            "/swagger-resources/**",
-                            "/swagger-ui.html",
-                            "/h2-console/**",
-                            "/uploads/**",
-                            "/api/**").permitAll()
+                    "/swagger-ui/**", 
+                    "/v3/api-docs/**", 
+                    "/swagger-resources/**",
+                    "/swagger-ui.html",
+                    "/h2-console/**",
+                    "/uploads/**",
+                    "/api/**").permitAll()
                 .anyRequest().authenticated()
             )
             .build();
