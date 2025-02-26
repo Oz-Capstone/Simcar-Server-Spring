@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -30,13 +29,15 @@ public class SecurityConfig {
         // 웹 프론트엔드 도메인 허용
         configuration.setAllowedOrigins(Arrays.asList(
             "http://localhost:3000",
+            "https://localhost:3000",
+            "http://simcar.netlify.app",
             "https://simcar.netlify.app"
         ));
         
         // 모바일 앱의 경우 Origin이 null이거나 다른 형태일 수 있음
         configuration.addAllowedOriginPattern("*");
         
-        // ...existing code...
+        // 허용할 HTTP 메서드 설정
         configuration.setAllowedMethods(Arrays.asList(
             "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
         ));
@@ -46,7 +47,7 @@ public class SecurityConfig {
             "Authorization",
             "Content-Type",
             "X-Requested-With",
-            "Accept",
+            "Accept", 
             "Origin",
             "Access-Control-Request-Method",
             "Access-Control-Request-Headers",
@@ -55,7 +56,17 @@ public class SecurityConfig {
             "Cache-Control"      // 캐시 제어
         ));
         
+        // 브라우저가 응답에 액세스할 수 있는 헤더 설정
+        configuration.setExposedHeaders(Arrays.asList(
+            "Access-Control-Allow-Origin",
+            "Access-Control-Allow-Credentials",
+            "Authorization"
+        ));
+        
+        // 자격 증명 허용 (쿠키, 인증 헤더 등)
         configuration.setAllowCredentials(true);
+        
+        // preflight 요청에 대한 캐시 시간 설정 (1시간)
         configuration.setMaxAge(3600L);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -65,20 +76,27 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
+        http
+            // HTTPS 리다이렉션 설정
             .requiresChannel(channel -> 
-                channel.requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
-                .requiresSecure()
+                channel.anyRequest().requiresSecure()
             )
+            // CSRF 보호 비활성화 (REST API에서는 필요 없음)
             .csrf(csrf -> csrf.disable())
+            
+            // CORS 설정 적용
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            
+            // 보안 헤더 설정 - 최신 API 사용
             .headers(headers -> {
-                headers.frameOptions(Customizer.withDefaults());
-                headers.xssProtection(Customizer.withDefaults());
+                headers.frameOptions(frameOptions -> frameOptions.sameOrigin());  // H2 콘솔 접근을 위해 필요
+                headers.xssProtection(xss -> xss.disable());  // XSS 보호 비활성화
                 headers.contentSecurityPolicy(csp -> 
-                    csp.policyDirectives("frame-ancestors 'self'")
+                    csp.policyDirectives("default-src 'self'; connect-src *; img-src * data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval';")
                 );
             })
+            
+            // URL별 권한 설정
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/",
@@ -91,7 +109,8 @@ public class SecurityConfig {
                     "/api/**",
                     "/error").permitAll()
                 .anyRequest().authenticated()
-            )
-            .build();
+            );
+        
+        return http.build();
     }
 }
