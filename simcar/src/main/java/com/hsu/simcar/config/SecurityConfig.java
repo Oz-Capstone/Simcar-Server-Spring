@@ -26,11 +26,38 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        
+        // 웹 프론트엔드 도메인 허용
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:3000",
+            "https://simcar.netlify.app"
+        ));
+        
+        // 모바일 앱의 경우 Origin이 null이거나 다른 형태일 수 있음
+        configuration.addAllowedOriginPattern("*");
+        
+        // ...existing code...
+        configuration.setAllowedMethods(Arrays.asList(
+            "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
+        ));
+        
+        // 모바일 앱에서 필요한 추가 헤더 포함
+        configuration.setAllowedHeaders(Arrays.asList(
+            "Authorization",
+            "Content-Type",
+            "X-Requested-With",
+            "Accept",
+            "Origin",
+            "Access-Control-Request-Method",
+            "Access-Control-Request-Headers",
+            "User-Agent",        // 모바일 앱 식별용
+            "Accept-Language",   // 다국어 지원
+            "Cache-Control"      // 캐시 제어
+        ));
+        
         configuration.setAllowCredentials(true);
-
+        configuration.setMaxAge(3600L);
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
