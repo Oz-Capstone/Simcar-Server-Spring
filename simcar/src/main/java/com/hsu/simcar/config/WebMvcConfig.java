@@ -17,11 +17,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        // 루트 경로 매핑 추가
-        registry.addViewController("/")
-            .setViewName("forward:/index.html");
-            
-        // 기존 매핑
+        // API 경로가 아닌 모든 요청을 index.html로 포워딩
         registry.addViewController("/{spring:\\w+}")
             .setViewName("forward:/index.html");
         registry.addViewController("/**/{spring:\\w+}")
