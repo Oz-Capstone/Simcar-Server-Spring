@@ -31,7 +31,9 @@ public class SecurityConfig {
             "http://localhost:3000",
             "https://localhost:3000",
             "http://simcar.netlify.app",
-            "https://simcar.netlify.app"
+            "https://simcar.netlify.app",
+            "http://simcar.kro.kr",
+            "https://simcar.kro.kr"
         ));
         
         // 모바일 앱의 경우 Origin이 null이거나 다른 형태일 수 있음
