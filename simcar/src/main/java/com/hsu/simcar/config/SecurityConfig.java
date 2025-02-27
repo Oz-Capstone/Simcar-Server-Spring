@@ -31,8 +31,7 @@ public class SecurityConfig {
             "http://localhost:3000",
             "https://localhost:3000",
             "http://simcar.netlify.app",
-            "https://simcar.netlify.app",
-            "https://simcar.kro.kr"
+            "https://simcar.netlify.app"
         ));
         
         // 모바일 앱의 경우 Origin이 null이거나 다른 형태일 수 있음
@@ -101,14 +100,6 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/",
-                    "/index.html",
-                    "/static/**",
-                    "/*.js",
-                    "/*.css",
-                    "/*.ico",
-                    "/*.png",
-                    "/*.svg",
-                    "/manifest.json",
                     "/swagger-ui/**", 
                     "/v3/api-docs/**", 
                     "/swagger-resources/**",
@@ -118,7 +109,7 @@ public class SecurityConfig {
                     "/api/**",
                     "/error").permitAll()
                 .anyRequest().authenticated()
-                );
+            );
         
         return http.build();
     }
