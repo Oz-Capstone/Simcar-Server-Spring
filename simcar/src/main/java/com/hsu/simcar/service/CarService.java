@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,8 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class CarService {
     private final CarRepository carRepository;
     private final MemberRepository memberRepository;
-    @Qualifier("mockAIDiagnosisService")
-    private final AICarDiagnosisService aiCarDiagnosisService;
+    private final AIDiagnosisService aiDiagnosisService;
     private final FileService fileService;
 
     @Transactional
@@ -161,7 +159,7 @@ public class CarService {
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 차량입니다"));
 
-        return aiCarDiagnosisService.diagnose(car);
+        return aiDiagnosisService.diagnose(car);
     }
 
     @Transactional
