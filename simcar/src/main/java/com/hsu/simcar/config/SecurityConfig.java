@@ -94,7 +94,7 @@ public class SecurityConfig {
                 headers.frameOptions(frameOptions -> frameOptions.sameOrigin());  // H2 콘솔 접근을 위해 필요
                 headers.xssProtection(xss -> xss.disable());  // XSS 보호 비활성화
                 headers.contentSecurityPolicy(csp -> 
-                    csp.policyDirectives("default-src 'self'; connect-src *; img-src * data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval';")
+                    csp.policyDirectives("default-src 'self'; connect-src *; img-src * data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval';")
                 );
             })
             
