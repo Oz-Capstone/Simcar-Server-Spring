@@ -20,7 +20,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -73,7 +75,7 @@ public class CarController {
 
     @Operation(summary = "차량 정보 수정")
     @PutMapping("/cars/{carId}")
-    public ResponseEntity<Void> updateCar(
+    public ResponseEntity<Map<String, String>> updateCar(
             @Parameter(
                 name = "carId",
                 description = "차량 ID", 
@@ -89,7 +91,11 @@ public class CarController {
             return ResponseEntity.status(401).build();
         }
         carService.updateCar(carId, sellerId, request);
-        return ResponseEntity.ok().build();
+
+        
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "차량 정보가 성공적으로 업데이트되었습니다.");
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "차량 대표 이미지 변경")
