@@ -13,7 +13,7 @@ public class MockAIDiagnosisService implements AIDiagnosisService {
         // TODO: 실제 AI 서비스 연동 전까지 임시 응답 제공
         return CarDiagnosisResponse.builder()
                 .carId(car.getId())
-                .reliabilityScore(85)
+                .reliabilityScore(100)
                 .evaluationComment("AI 진단 서비스 준비 중입니다.")
                 .build();
     }
