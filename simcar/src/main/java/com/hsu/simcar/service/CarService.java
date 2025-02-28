@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class CarService {
+    @Value("${app.server.url}")
+    private String appServerUrl;
     private final CarRepository carRepository;
     private final MemberRepository memberRepository;
     private final AICarDiagnosisService aiCarDiagnosisService;
@@ -61,7 +64,7 @@ public class CarService {
                     .car(car)
                     .originalFileName(image.getOriginalFilename())
                     .storedFileName(storedFileName)
-                    .filePath("/uploads/cars/" + storedFileName) // 저장된 파일의 접근 경로
+                    .filePath(appServerUrl + "/uploads/" + storedFileName) // URL 전체 경로 사용
                     .fileSize(image.getSize())
                     .contentType(image.getContentType())
                     .isThumbnail(i == 0) // 첫 번째 이미지를 대표 이미지로 설정
@@ -179,7 +182,7 @@ public class CarService {
                     .car(car)
                     .originalFileName(image.getOriginalFilename())
                     .storedFileName(storedFileName)
-                    .filePath("/uploads/cars/" + storedFileName)
+                    .filePath(appServerUrl + "/uploads/" + storedFileName) // URL 전체 경로 사용 
                     .fileSize(image.getSize())
                     .contentType(image.getContentType())
                     .isThumbnail(false)
