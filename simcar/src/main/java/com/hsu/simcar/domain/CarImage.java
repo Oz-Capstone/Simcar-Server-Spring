@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
+import org.springframework.beans.factory.annotation.Value;
 
 @Entity
 @Getter
@@ -35,6 +36,12 @@ public class CarImage {
     private String contentType;         // 파일 타입
     private boolean isThumbnail;        // 대표 이미지 여부
     
+    @Value("${app.server.url}")
+    private String serverUrl;
+    
+    public String getFilePath() {
+        return serverUrl + filePath;
+    }
 
     public void setCar(Car car) {
         this.car = car;
