@@ -2,10 +2,8 @@ package com.hsu.simcar.service;
 
 import com.hsu.simcar.domain.Car;
 import com.hsu.simcar.dto.CarDiagnosisResponse;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-@Primary
 @Service
 public class MockAIDiagnosisService implements AIDiagnosisService {
     @Override
